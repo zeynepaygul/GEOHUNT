@@ -1,0 +1,113 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background: url('wallpaper.jpeg') no-repeat center center fixed;
+    background-size: cover;
+    color: white;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.6); 
+    padding: 50px;
+    border-radius: 80px;
+}
+
+.logo {
+    width: 200px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 36px;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+input {
+    width: 90%;
+    max-width: 400px;
+    padding: 15px;
+    font-size: 20px;
+    margin-bottom: 20px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.start-game {
+    width: 260px;
+    padding: 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #163475; 
+    color: white;
+    margin-bottom: 20px;
+    transition: 0.3s;
+}
+
+.start-game:hover {
+    background-color: #0aa31f;
+    transform: scale(1.05);
+}
+
+.how-to-play {
+    font-size: 22px;
+    text-decoration: none;
+    color: #ffffff; 
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.how-to-play:hover {
+    text-decoration: underline;
+    color: #c5cace; 
+}
+
+
+
+
+
+
+.description {
+    font-size: 20px;
+    max-width: 600px;
+    margin-top: 10px;
+    line-height: 1.6;
+}
+
+.back-button {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 15px 30px;
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+    background-color: #FF5733; 
+    border-radius: 10px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.back-button:hover {
+    background-color: #C70039;
+    transform: scale(1.05);
+}
+.logo {
+    width: 300px;
+    height: 300px;
+    display: block;
+    margin: 0 auto;
+}

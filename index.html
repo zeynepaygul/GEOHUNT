@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CityHunt</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <img src="logo.png" alt="Oyun Logosu" class="logo">
+        
+        <h1>GeoHunt</h1>
+        
+        <input type="text" id="name" placeholder="İsim Soyisim">
+        
+        <button class="start-game" onclick="startGame()">OYUNA BAŞLA</button>
+        
+        <a href="how_to_play.html" class="how-to-play">Nasıl Oynanır ?</a>
+    </div>
+
+    <script>
+        async function startGame() {
+            let name = document.getElementById("name").value.trim();
+            console.log(name);
+            window.name = name;
+            if (!name) {
+                alert("Lütfen isminizi girin!");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:5051/addUser", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: name })
+                });
+                window.location.href = "game.html";
+            } catch (error) {
+                console.error("İstek hatası:", error);
+            }
+        }
+    </script>
+</body>
+</html>

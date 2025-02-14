@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Hunt</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/jquery"></script>
+    <script src="https://unpkg.com/leaflet-ajax/dist/leaflet.ajax.min.js"></script>
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+    <script src="game.js" defer></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #63ceaf; /* Harita dışı arka plan */
+            font-family: Arial, sans-serif; /* Change font to Arial */
+            font-size: 27px; /* Increase font size by 1.5 times */
+            font-weight: bold; /* Make text bold */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #header {
+            background-color: #4236b1; /* Başlığın arkasındaki plan rengi */
+            color: white; /* Başlık yazı rengi */
+            text-align: center;
+            padding: 20px;
+            font-size: 35px;
+            font-weight: bold;
+            letter-spacing: 6px;
+            position: relative;
+            width: 100%;
+        }
+        
+        #timer {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 25px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        #map {
+            width: 100%;
+            height: calc(100vh - 80px);
+            background-color: #c2ece7; /* Harita içi arka plan rengi */
+        }
+        
+        .city-label {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 4px 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #222;
+            border-radius: 5px;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Add styles for the popup and other elements */
+        .popup, .notification {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            border-radius: 10px;
+            text-align: center;
+            width: 80%;
+            max-width: 500px;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .timer, .score {
+            font-size: 30px; /* Increase font size by 1.5 times */
+            font-weight: bold; /* Make text bold */
+            margin-bottom: 10px;
+        }
+        .notification {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .notification.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .notification button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px; /* Increase font size */
+        }
+        .notification button:hover {
+            background-color: #0056b3;
+        }
+        .popup-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .popup-content img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+        .popup-content p {
+            margin-bottom: 10px;
+        }
+        .popup-content button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px; /* Increase font size */
+        }
+        .popup-content button:hover {
+            background-color: #0056b3;
+        }
+        /* Add to existing styles */
+        .final-score {
+            text-align: center;
+            padding: 20px;
+        }
+        .final-score h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .final-score p {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+        .retry-button {
+            display: none;
+        }
+        .final-score button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        GeoHunt
+        <div id="timer">100</div>
+        <div id="score-display">Toplam Puan: <span id="score">0</span></div>
+        <div id="lives-display" style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); font-size: 25px;">❤️❤️❤️</div>
+    </div>
+    <div id="map"></div>
+    <div class="overlay"></div>
+    <div class="popup">
+        <div class="timer">Süre: <span id="question-timer">15</span> saniye</div>
+        <div class="score">Toplam Puan: <span id="score">0</span></div>
+        <div class="popup-content">
+            <img id="clue-image" src="" alt="İpucu Görseli">
+            <p id="clue-text">İpucu: </p>
+            <button id="show-map-button">Haritayı Göster</button>
+            <button id="next-question-button" style="display: none;">Yeni Soruya Geç</button>
+        </div>
+    </div>
+    <div class="notification" id="notification">
+        <p id="notification-text"></p>
+        <button class="next-button" onclick="nextQuestion()">Sıradaki Soru</button>
+        <button class="retry-button" onclick="retryQuestion()">Tekrar Dene</button>
+    </div>
+    <div class="notification" id="time-up-notification">
+        <p>Süreniz doldu! Tekrar deneyebilir veya sıradaki soruya geçebilirsiniz.</p>
+        <button onclick="retryTimeUpQuestion()">Tekrar Dene</button>
+        <button onclick="closeTimeUpNotification()">Sıradaki Soru</button>
+    </div>
+</body>
+</html>
